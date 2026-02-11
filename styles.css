@@ -104,3 +104,23 @@ body {
   background: #f8fbff;
   cursor: pointer;
 }
+
+.grid3-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.grid3-toolbar button {
+  padding: 4px 10px;
+}
+
+.rg-row-selected {
+  background: #d9eaff;
+}
+
+.rg-table td[contenteditable='true']:focus {
+  outline: 2px solid #7aa6ff;
+  outline-offset: -2px;
+  background: #fff;
+}

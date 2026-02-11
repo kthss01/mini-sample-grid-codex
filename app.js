@@ -20,6 +20,22 @@ class LocalDataProvider {
     this._emit();
   }
 
+  removeRow(index) {
+    if (index < 0 || index >= this.rows.length) {
+      return;
+    }
+    this.rows.splice(index, 1);
+    this._emit();
+  }
+
+  updateCell(index, field, value) {
+    if (index < 0 || index >= this.rows.length || !this.fields.includes(field)) {
+      return;
+    }
+    this.rows[index][field] = value;
+    this._emit();
+  }
+
   getJsonRows() {
     return [...this.rows];
   }
@@ -45,9 +61,36 @@ class GridView {
     this.columns = columns;
     this.dataProvider = dataProvider;
     this.clickable = options.clickable;
+    this.selectable = options.selectable;
+    this.editable = options.editable;
     this.onRowClicked = options.onRowClicked;
+    this.onSelectionChanged = options.onSelectionChanged;
+    this.selectedRowIndex = -1;
 
-    this.dataProvider.onChange = () => this.render();
+    this.dataProvider.onChange = () => {
+      const rows = this.dataProvider.getJsonRows();
+      if (this.selectedRowIndex >= rows.length) {
+        this.selectedRowIndex = -1;
+        this.onSelectionChanged?.(this.selectedRowIndex);
+      }
+      this.render();
+    };
+    this.render();
+  }
+
+  getSelectedRowIndex() {
+    return this.selectedRowIndex;
+  }
+
+  clearSelection() {
+    this.selectedRowIndex = -1;
+    this.onSelectionChanged?.(this.selectedRowIndex);
+    this.render();
+  }
+
+  selectRow(index) {
+    this.selectedRowIndex = index;
+    this.onSelectionChanged?.(this.selectedRowIndex);
     this.render();
   }
 
@@ -69,13 +112,37 @@ class GridView {
     const tbody = document.createElement('tbody');
     rows.forEach((row, rowIndex) => {
       const tr = document.createElement('tr');
-      if (this.clickable) {
-        tr.className = 'rg-row-clickable';
-        tr.addEventListener('click', () => this.onRowClicked?.(row, rowIndex));
+
+      if (this.selectable && rowIndex === this.selectedRowIndex) {
+        tr.classList.add('rg-row-selected');
       }
+
+      if (this.clickable || this.selectable) {
+        tr.classList.add('rg-row-clickable');
+        tr.addEventListener('click', () => {
+          if (this.selectable) {
+            this.selectRow(rowIndex);
+          }
+          if (this.clickable) {
+            this.onRowClicked?.(row, rowIndex);
+          }
+        });
+      }
+
       this.columns.forEach((column) => {
         const td = document.createElement('td');
-        td.textContent = row[column.fieldName] ?? '';
+        const fieldValue = row[column.fieldName] ?? '';
+
+        if (this.editable) {
+          td.contentEditable = 'true';
+          td.textContent = fieldValue;
+          td.addEventListener('blur', () => {
+            this.dataProvider.updateCell(rowIndex, column.fieldName, td.textContent?.trim() ?? '');
+          });
+        } else {
+          td.textContent = fieldValue;
+        }
+
         tr.appendChild(td);
       });
       tbody.appendChild(tr);
@@ -191,7 +258,7 @@ new GridView(
   grid2Provider,
 );
 
-new GridView(
+const grid3View = new GridView(
   document.querySelector('#grid3'),
   [
     { name: 'PASTE_RAW', fieldName: 'PASTE_RAW' },
@@ -203,6 +270,10 @@ new GridView(
     { name: 'SORT_KEY', fieldName: 'SORT_KEY' },
   ],
   grid3Provider,
+  {
+    selectable: true,
+    editable: true,
+  },
 );
 
 const searchBtn = document.querySelector('#searchBtn');
@@ -213,6 +284,9 @@ searchBtn.addEventListener('click', async () => {
 });
 
 const grid3Host = document.querySelector('#grid3');
+const grid3AddBtn = document.querySelector('#grid3AddBtn');
+const grid3DeleteBtn = document.querySelector('#grid3DeleteBtn');
+const grid3ClearBtn = document.querySelector('#grid3ClearBtn');
 
 function onPaste(rawText) {
   const trBlocks = extractTrBlocks(rawText);
@@ -226,6 +300,32 @@ grid3Host.addEventListener('paste', (event) => {
   event.preventDefault();
   const rawText = event.clipboardData?.getData('text/plain') ?? '';
   onPaste(rawText);
+});
+
+grid3AddBtn.addEventListener('click', () => {
+  grid3Provider.appendRow({
+    PASTE_RAW: '',
+    FIELD_NAME: '',
+    BIND_NAME: '',
+    TYPE: '',
+    DATA_TYPE: '',
+    REQUIRED: '',
+    SORT_KEY: '',
+  });
+  const lastIndex = grid3Provider.getJsonRows().length - 1;
+  grid3View.selectRow(lastIndex);
+});
+
+grid3DeleteBtn.addEventListener('click', () => {
+  const selectedRowIndex = grid3View.getSelectedRowIndex();
+  if (selectedRowIndex >= 0) {
+    grid3Provider.removeRow(selectedRowIndex);
+  }
+});
+
+grid3ClearBtn.addEventListener('click', () => {
+  grid3Provider.clearRows();
+  grid3View.clearSelection();
 });
 
 // demo seed for immediate interaction
