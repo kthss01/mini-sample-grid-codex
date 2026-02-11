@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RealGrid Style Functional Screen</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="layout-root">
+      <section class="search-panel">
+        <h1>검색 조건</h1>
+        <div class="search-row">
+          <input id="keywordInput" type="text" placeholder="테이블명 검색" />
+          <button id="searchBtn" type="button">검색</button>
+        </div>
+      </section>
+
+      <section class="grid-stack">
+        <article class="grid-card">
+          <header>그리드1 (테이블 목록)</header>
+          <div id="grid1" class="grid-host"></div>
+        </article>
+
+        <article class="grid-card">
+          <header>그리드2 (선택 목록)</header>
+          <div id="grid2" class="grid-host"></div>
+        </article>
+
+        <article class="grid-card">
+          <header>그리드3 (붙여넣기 파싱)</header>
+          <p class="hint">그리드 내부 클릭 후 Ctrl+V (table/tr HTML)</p>
+          <div id="grid3" class="grid-host grid-paste" tabindex="0"></div>
+        </article>
+      </section>
+    </main>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
