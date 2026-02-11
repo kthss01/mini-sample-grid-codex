@@ -16,26 +16,33 @@
         </div>
       </section>
 
-      <section class="grid-stack">
-        <article class="grid-card">
-          <header>그리드1 (테이블 목록)</header>
-          <div id="grid1" class="grid-host"></div>
-        </article>
+      <section class="grid-layout">
+        <section class="left-stack">
+          <article class="grid-card">
+            <header>그리드1 (테이블 목록)</header>
+            <div id="grid1" class="grid-host"></div>
+          </article>
 
-        <article class="grid-card">
-          <header>그리드2 (선택 목록)</header>
-          <div id="grid2" class="grid-host"></div>
-        </article>
+          <article class="grid-card">
+            <header>그리드2 (선택 목록)</header>
+            <div id="grid2" class="grid-host"></div>
+          </article>
 
-        <article class="grid-card">
-          <header>그리드3 (붙여넣기 파싱)</header>
-          <div class="grid3-toolbar">
-            <button id="grid3AddBtn" type="button">추가</button>
-            <button id="grid3DeleteBtn" type="button">삭제</button>
-            <button id="grid3ClearBtn" type="button">Clear</button>
-          </div>
-          <p class="hint">그리드 내부 클릭 후 Ctrl+V (table/tr HTML)</p>
-          <div id="grid3" class="grid-host grid-paste" tabindex="0"></div>
+          <article class="grid-card">
+            <header>그리드3 (붙여넣기 파싱)</header>
+            <div class="grid3-toolbar">
+              <button id="grid3AddBtn" type="button">추가</button>
+              <button id="grid3DeleteBtn" type="button">삭제</button>
+              <button id="grid3ClearBtn" type="button">Clear</button>
+            </div>
+            <p class="hint">그리드 내부 클릭 후 Ctrl+V (table/tr HTML)</p>
+            <div id="grid3" class="grid-host grid-paste" tabindex="0"></div>
+          </article>
+        </section>
+
+        <article class="grid-card grid4-card">
+          <header>그리드4</header>
+          <div id="grid4" class="grid-host"></div>
         </article>
       </section>
     </main>

@@ -131,8 +131,21 @@ class GridView {
 
       this.columns.forEach((column) => {
         const td = document.createElement('td');
-        const fieldValue = row[column.fieldName] ?? '';
+        if (column.type === 'action') {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'rg-delete-btn';
+          btn.textContent = column.actionLabel ?? '삭제';
+          btn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            column.onAction?.(row, rowIndex);
+          });
+          td.appendChild(btn);
+          tr.appendChild(td);
+          return;
+        }
 
+        const fieldValue = row[column.fieldName] ?? '';
         if (this.editable) {
           td.contentEditable = 'true';
           td.textContent = fieldValue;
@@ -230,6 +243,7 @@ async function fetchTableList(keyword = '') {
 const grid1Provider = new LocalDataProvider(['TABLE', 'TABLE_NAME']);
 const grid2Provider = new LocalDataProvider(['TABLE', 'TABLE_NAME']);
 const grid3Provider = new LocalDataProvider(['PASTE_RAW', 'FIELD_NAME', 'BIND_NAME', 'TYPE', 'DATA_TYPE', 'REQUIRED', 'SORT_KEY']);
+const grid4Provider = new LocalDataProvider(['TABLE', 'COLUMN_NAME', 'ITEM_NAME', 'IO', 'LENGTH', 'REQUIRED']);
 
 new GridView(
   document.querySelector('#grid1'),
@@ -274,6 +288,27 @@ const grid3View = new GridView(
     selectable: true,
     editable: true,
   },
+);
+
+new GridView(
+  document.querySelector('#grid4'),
+  [
+    {
+      name: '삭제',
+      type: 'action',
+      actionLabel: '삭제',
+      onAction: (_, rowIndex) => {
+        grid4Provider.removeRow(rowIndex);
+      },
+    },
+    { name: '테이블', fieldName: 'TABLE' },
+    { name: '컬럼명', fieldName: 'COLUMN_NAME' },
+    { name: '항목명', fieldName: 'ITEM_NAME' },
+    { name: 'I/O', fieldName: 'IO' },
+    { name: '길이', fieldName: 'LENGTH' },
+    { name: '필수', fieldName: 'REQUIRED' },
+  ],
+  grid4Provider,
 );
 
 const searchBtn = document.querySelector('#searchBtn');
@@ -330,3 +365,21 @@ grid3ClearBtn.addEventListener('click', () => {
 
 // demo seed for immediate interaction
 grid1Provider.setRows([]);
+grid4Provider.setRows([
+  {
+    TABLE: 'TB_CNTR',
+    COLUMN_NAME: 'CNTR_ID',
+    ITEM_NAME: '계약번호',
+    IO: 'I',
+    LENGTH: '20',
+    REQUIRED: 'Y',
+  },
+  {
+    TABLE: 'TB_CNTR',
+    COLUMN_NAME: 'CNTR_NM',
+    ITEM_NAME: '계약명',
+    IO: 'O',
+    LENGTH: '100',
+    REQUIRED: 'N',
+  },
+]);
